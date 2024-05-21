@@ -1,22 +1,30 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const cors = require('cors');
+const port = 3001
 const uuid = require('uuid')
 app.use(express.json())
+
+const corsOptions = {
+    origin: 'https://cool-brigadeiros-ed4abd.netlify.app',
+    optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 
 const orders = []
 
 const checkOrderId = (request, response, next) => {
     const { id } = request.params
-    const index = orders.findIndex( order => order.id === id)
+    const index = orders.findIndex(order => order.id === id)
 
-    if(index < 0){
-        return response.status(404).json({error: "order not found"})
+    if (index < 0) {
+        return response.status(404).json({ error: "order not found" })
     }
 
     request.orderIndex = index
     request.orderId = id
-    
+
     next()
 }
 
@@ -35,7 +43,7 @@ app.get('/order', showMethod, (request, response) => {
 })
 
 app.post('/order', showMethod, (request, response) => {
-    
+
     const { order, name, price } = request.body
     const status = "Em prepraração"
 
@@ -47,13 +55,13 @@ app.post('/order', showMethod, (request, response) => {
 
 })
 
-app.put('/order/:id', checkOrderId , showMethod, (request, response) => {
+app.put('/order/:id', checkOrderId, showMethod, (request, response) => {
 
-    const {order, name, price, status} = request.body
+    const { order, name, price, status } = request.body
     const id = request.orderId
     const index = request.orderIndex
 
-    const updateOrder = {id, order, name, price, status}
+    const updateOrder = { id, order, name, price, status }
 
     orders[index] = updateOrder
 
@@ -61,7 +69,7 @@ app.put('/order/:id', checkOrderId , showMethod, (request, response) => {
 
 })
 
-app.delete('/order/:id', checkOrderId, showMethod,  (request, response) => {
+app.delete('/order/:id', checkOrderId, showMethod, (request, response) => {
 
     const index = request.orderIndex
     orders.splice(index, 1)
@@ -78,7 +86,7 @@ app.get('/order/:id', checkOrderId, showMethod, (request, response) => {
     return response.json(showOrder)
 })
 
-app.patch('/order/:id', checkOrderId, showMethod,  (request, response) => {
+app.patch('/order/:id', checkOrderId, showMethod, (request, response) => {
     const id = request.orderId;
     const index = request.orderIndex;
     const status = "Pronto";
